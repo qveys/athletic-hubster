@@ -7,6 +7,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { CompetitionDialog } from "@/components/competitions/CompetitionDialog";
 import { CompetitionCard } from "@/components/competitions/CompetitionCard";
 
+interface Competition {
+  id: string;
+  name: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  status: "upcoming" | "ongoing" | "completed";
+  created_at: string;
+  updated_at: string;
+}
+
 const Competitions = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -28,7 +39,11 @@ const Competitions = () => {
         throw error;
       }
 
-      return data;
+      // Ensure the status is of the correct type
+      return (data as any[]).map(competition => ({
+        ...competition,
+        status: competition.status || "upcoming"
+      })) as Competition[];
     },
   });
 

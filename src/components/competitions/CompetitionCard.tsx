@@ -3,6 +3,7 @@ import { fr } from "date-fns/locale";
 import { Trophy, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Competition {
   id: string;
@@ -57,9 +58,9 @@ export function CompetitionCard({ competition }: CompetitionCardProps) {
           
           <Badge
             variant="secondary"
-            className={cn("font-medium", statusColors[competition.status])}
+            className={cn("font-medium", statusColors[competition.status as keyof typeof statusColors])}
           >
-            {statusLabels[competition.status]}
+            {statusLabels[competition.status as keyof typeof statusLabels]}
           </Badge>
         </div>
       </CardContent>
