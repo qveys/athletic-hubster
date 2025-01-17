@@ -1,33 +1,30 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft } from "lucide-react";
-
-type ProfileFormData = {
-  username: string;
-  full_name: string;
-};
+import { ProfileForm } from "@/components/profile/ProfileForm";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormData>();
+  const [profileData, setProfileData] = useState<{
+    username: string | null;
+    full_name: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      try {
-        if (!user?.id) return;
+      if (!user?.id) {
+        toast.error("No user found. Please log in again.");
+        return;
+      }
 
+      try {
         const { data, error } = await supabase
           .from('profiles')
           .select('username, full_name, avatar_url')
@@ -41,11 +38,28 @@ const Profile = () => {
         }
 
         if (data) {
-          setValue('username', data.username || '');
-          setValue('full_name', data.full_name || '');
+          setProfileData(data);
           setAvatarUrl(data.avatar_url);
         } else {
-          toast.error("Profile not found. Please try logging in again.");
+          // Si aucun profil n'est trouvé, on crée un nouveau profil
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ 
+              id: user.id,
+              username: user.email?.split('@')[0] || null,
+              full_name: null
+            }]);
+
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+            toast.error("Error creating profile");
+            return;
+          }
+
+          setProfileData({
+            username: user.email?.split('@')[0] || null,
+            full_name: null
+          });
         }
       } catch (error: any) {
         console.error('Error in fetchProfile:', error);
@@ -54,76 +68,11 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [user?.id, setValue]);
+  }, [user?.id, user?.email]);
 
-  const onSubmit = async (data: ProfileFormData) => {
-    try {
-      setIsLoading(true);
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          username: data.username,
-          full_name: data.full_name,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      toast.success("Profile updated successfully!");
-      navigate(-1); // Go back to the previous page
-    } catch (error: any) {
-      toast.error("Error updating profile: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      // Check file size (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("File size should be less than 2MB");
-        return;
-      }
-
-      setIsLoading(true);
-      
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user?.id}/${crypto.randomUUID()}.${fileExt}`;
-
-      const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      // Update profile with new avatar URL
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user?.id);
-
-      if (updateError) throw updateError;
-
-      setAvatarUrl(publicUrl);
-      toast.success("Avatar updated successfully!");
-    } catch (error: any) {
-      toast.error("Error uploading avatar: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-sport-50">
@@ -142,65 +91,22 @@ const Profile = () => {
           </div>
           
           <div className="max-w-2xl bg-white rounded-lg shadow p-6">
-            <div className="mb-6">
-              <Label className="block mb-2">Profile Picture</Label>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={avatarUrl || undefined} />
-                  <AvatarFallback>
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    disabled={isLoading}
-                  />
-                  <p className="text-sm text-sport-600 mt-1">
-                    Maximum file size: 2MB
-                  </p>
-                </div>
-              </div>
-            </div>
+            <AvatarUpload
+              userId={user.id}
+              initialAvatarUrl={avatarUrl}
+              userEmail={user.email}
+              onAvatarUpdate={setAvatarUrl}
+            />
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  {...register("username", { required: "Username is required" })}
-                />
-                {errors.username && (
-                  <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  {...register("full_name", { required: "Full name is required" })}
-                />
-                {errors.full_name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.full_name.message}</p>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate(-1)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
-            </form>
+            {profileData && (
+              <ProfileForm
+                userId={user.id}
+                initialData={profileData}
+                onSuccess={() => {
+                  // Vous pouvez ajouter des actions supplémentaires ici si nécessaire
+                }}
+              />
+            )}
           </div>
         </div>
       </main>
