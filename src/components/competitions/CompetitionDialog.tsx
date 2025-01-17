@@ -42,7 +42,6 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
 
     setIsSubmitting(true);
     
-    // Format dates to YYYY-MM-DD format for Supabase
     const formattedStartDate = format(startDate, 'yyyy-MM-dd');
     const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
@@ -132,12 +131,13 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={startDate}
                     onSelect={setStartDate}
                     initialFocus
+                    locale={fr}
                   />
                 </PopoverContent>
               </Popover>
@@ -162,12 +162,13 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={endDate}
                     onSelect={setEndDate}
                     initialFocus
+                    locale={fr}
                   />
                 </PopoverContent>
               </Popover>
