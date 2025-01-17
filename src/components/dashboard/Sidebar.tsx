@@ -1,38 +1,31 @@
 import { Link } from "react-router-dom";
-import { Calendar, Users, Trophy, ShoppingCart, BarChart3, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Home, User, LogOut } from "lucide-react";
 
 const Sidebar = () => {
-  const menuItems = [
-    { icon: BarChart3, label: "Dashboard", path: "/" },
-    { icon: Users, label: "Members", path: "/members" },
-    { icon: Calendar, label: "Schedule", path: "/schedule" },
-    { icon: Trophy, label: "Competitions", path: "/competitions" },
-    { icon: ShoppingCart, label: "Equipment", path: "/equipment" },
-    { icon: Settings, label: "Settings", path: "/settings" },
-  ];
+  const { signOut } = useAuth();
 
   return (
-    <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0 animate-slide-in">
-      <div className="flex flex-col h-full">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-sport-900">SportSync</h1>
-        </div>
-        <nav className="flex-1 px-4">
-          <ul className="space-y-2">
-            {menuItems.map((item) => (
-              <li key={item.label}>
-                <Link
-                  to={item.path}
-                  className="flex items-center px-4 py-3 text-sport-600 hover:bg-sport-50 rounded-lg transition-colors duration-150"
-                >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <div className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-sport-200 p-4 flex flex-col animate-slide-in">
+      <div className="flex-1">
+        <Link to="/" className="flex items-center gap-2 px-4 py-2 text-sport-900 hover:bg-sport-50 rounded-lg">
+          <Home className="w-5 h-5" />
+          <span>Home</span>
+        </Link>
+        <Link to="/profile" className="flex items-center gap-2 px-4 py-2 text-sport-900 hover:bg-sport-50 rounded-lg">
+          <User className="w-5 h-5" />
+          <span>Profile</span>
+        </Link>
       </div>
+      <Button
+        variant="ghost"
+        className="w-full justify-start gap-2"
+        onClick={() => signOut()}
+      >
+        <LogOut className="w-5 h-5" />
+        Sign Out
+      </Button>
     </div>
   );
 };
