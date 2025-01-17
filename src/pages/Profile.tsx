@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft } from "lucide-react";
 
 type ProfileFormData = {
   username: string;
@@ -38,6 +39,7 @@ const Profile = () => {
       if (error) throw error;
 
       toast.success("Profile updated successfully!");
+      navigate(-1); // Go back to the previous page
     } catch (error: any) {
       toast.error("Error updating profile: " + error.message);
     } finally {
@@ -94,7 +96,17 @@ const Profile = () => {
     <div className="min-h-screen bg-sport-50">
       <main className="pl-64 pt-16">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-sport-900 mb-8">Profile Settings</h1>
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="hover:bg-sport-100"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold text-sport-900">Profile Settings</h1>
+          </div>
           
           <div className="max-w-2xl bg-white rounded-lg shadow p-6">
             <div className="mb-6">
@@ -143,9 +155,18 @@ const Profile = () => {
                 )}
               </div>
 
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate(-1)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
             </form>
           </div>
         </div>
