@@ -26,27 +26,34 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        if (!user?.id) return;
+
         const { data, error } = await supabase
           .from('profiles')
           .select('username, full_name, avatar_url')
-          .eq('id', user?.id)
-          .single();
+          .eq('id', user.id)
+          .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching profile:', error);
+          toast.error("Error loading profile");
+          return;
+        }
 
         if (data) {
           setValue('username', data.username || '');
           setValue('full_name', data.full_name || '');
           setAvatarUrl(data.avatar_url);
+        } else {
+          toast.error("Profile not found. Please try logging in again.");
         }
       } catch (error: any) {
+        console.error('Error in fetchProfile:', error);
         toast.error("Error loading profile: " + error.message);
       }
     };
 
-    if (user?.id) {
-      fetchProfile();
-    }
+    fetchProfile();
   }, [user?.id, setValue]);
 
   const onSubmit = async (data: ProfileFormData) => {
