@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Home, User, LogOut } from "lucide-react";
+import { Home, User, LogOut, Trophy } from "lucide-react";
 
 const Sidebar = () => {
   const { signOut } = useAuth();
@@ -16,6 +16,10 @@ const Sidebar = () => {
         <Link to="/profile" className="flex items-center gap-2 px-4 py-2 text-sport-900 hover:bg-sport-50 rounded-lg">
           <User className="w-5 h-5" />
           <span>Profile</span>
+        </Link>
+        <Link to="/competitions" className="flex items-center gap-2 px-4 py-2 text-sport-900 hover:bg-sport-50 rounded-lg">
+          <Trophy className="w-5 h-5" />
+          <span>Competitions</span>
         </Link>
       </div>
       <Button
