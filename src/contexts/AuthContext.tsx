@@ -1,10 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { toast } from '@/components/ui/use-toast';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing environment variables: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be defined');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type AuthContextType = {
   user: any | null;
@@ -36,16 +41,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error signing in",
+        description: error.message,
+      });
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: error.message,
+      });
+      throw error;
+    }
   };
 
   return (
