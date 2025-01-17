@@ -1,12 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Sidebar from "@/components/dashboard/Sidebar";
+import Header from "@/components/dashboard/Header";
+import Stats from "@/components/dashboard/Stats";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-sport-50">
+      <Sidebar />
+      <Header />
+      <main className="pl-64 pt-16">
+        <div className="p-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-sport-900">Welcome back</h1>
+            <p className="text-sport-600 mt-2">Here's what's happening with your club today.</p>
+          </div>
+          <Stats />
+        </div>
+      </main>
     </div>
   );
 };
