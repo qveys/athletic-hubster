@@ -9,7 +9,7 @@ const Login = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+      if (event === 'SIGNED_IN') {
         navigate("/");
       }
     });
@@ -21,7 +21,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome to SportSync</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
         <Auth
