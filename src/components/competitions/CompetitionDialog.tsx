@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -41,18 +41,24 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
     }
 
     setIsSubmitting(true);
+    
+    // Format dates to YYYY-MM-DD format for Supabase
+    const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+    const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
     const { error } = await supabase
       .from("competitions")
       .insert([
         {
           name,
           description,
-          start_date: startDate.toISOString(),
-          end_date: endDate.toISOString(),
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
         },
       ]);
 
     if (error) {
+      console.error("Error creating competition:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -81,6 +87,9 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Nouvelle compétition</DialogTitle>
+          <DialogDescription>
+            Créez une nouvelle compétition en remplissant les champs ci-dessous.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
