@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,7 +21,33 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   
-  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormData>();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormData>();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, full_name, avatar_url')
+          .eq('id', user?.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setValue('username', data.username || '');
+          setValue('full_name', data.full_name || '');
+          setAvatarUrl(data.avatar_url);
+        }
+      } catch (error: any) {
+        toast.error("Error loading profile: " + error.message);
+      }
+    };
+
+    if (user?.id) {
+      fetchProfile();
+    }
+  }, [user?.id, setValue]);
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
