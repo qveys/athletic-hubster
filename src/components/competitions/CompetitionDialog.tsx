@@ -13,6 +13,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
 interface CompetitionDialogProps {
   open: boolean;
@@ -46,9 +47,11 @@ export function CompetitionDialog({ open, onOpenChange }: CompetitionDialogProps
     const formattedEndDate = format(endDate, 'yyyy-MM-dd');
 
     const { error } = await supabase
+        .schema("athletic")
       .from("competitions")
       .insert([
         {
+          id: uuidv4(),
           name,
           description,
           start_date: formattedStartDate,
