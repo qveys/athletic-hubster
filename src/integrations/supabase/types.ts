@@ -7,23 +7,26 @@ export type Json =
   | Json[]
 
 export type Database = {
-  public: {
+  athletic: {
     Tables: {
       competition_teams: {
         Row: {
           competition_id: string
           joined_at: string
           team_id: string
+          avatar_url: string | null
         }
         Insert: {
           competition_id: string
           joined_at?: string
           team_id: string
+          avatar_url?: string | null
         }
         Update: {
           competition_id?: string
           joined_at?: string
           team_id?: string
+          avatar_url?: string | null
         }
         Relationships: [
           {
@@ -191,19 +194,19 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"] | null
+          role: Database["athletic"]["Enums"]["app_role"] | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["athletic"]["Enums"]["app_role"] | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"] | null
+          role?: Database["athletic"]["Enums"]["app_role"] | null
           user_id?: string | null
         }
         Relationships: []
@@ -224,7 +227,7 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type PublicSchema = Database[Extract<keyof Database, "athletic">]
 
 export type Tables<
   PublicTableNameOrOptions extends

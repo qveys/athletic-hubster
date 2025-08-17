@@ -1,8 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import * as process from "node:process";
 
-const SUPABASE_URL = "https://xtpzablwtpsyuzhylnce.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0cHphYmx3dHBzeXV6aHlsbmNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMDA3NzcsImV4cCI6MjA1MjY3Njc3N30.e75EumF3qYJzlvuoHQdwufZSuL30KbhPIz82OiBVn8w";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://xtpzablwtpsyuzhylnce.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0cHphYmx3dHBzeXV6aHlsbmNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMDA3NzcsImV4cCI6MjA1MjY3Njc3N30.e75EumF3qYJzlvuoHQdwufZSuL30KbhPIz82OiBVn8w";
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file');
+}
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
