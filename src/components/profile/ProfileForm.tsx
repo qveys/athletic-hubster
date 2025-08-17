@@ -33,6 +33,7 @@ export const ProfileForm = ({ userId, initialData, onSuccess }: ProfileFormProps
   const onSubmit = async (data: ProfileFormData) => {
     try {
       const { error } = await supabase
+          .schema('athletic')
         .from('profiles')
         .update({
           username: data.username,

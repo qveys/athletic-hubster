@@ -40,7 +40,7 @@ export const AvatarUpload = ({
       const filePath = `${userId}/${crypto.randomUUID()}.${fileExt}`;
 
       const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
+          .from('avatars')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
@@ -50,6 +50,7 @@ export const AvatarUpload = ({
         .getPublicUrl(filePath);
 
       const { error: updateError } = await supabase
+          .schema('athletic')
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', userId);
@@ -60,9 +61,10 @@ export const AvatarUpload = ({
       toast.success("Avatar mis à jour avec succès !", {
         description: "Votre nouvelle photo de profil est maintenant visible"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
       toast.error("Erreur lors du téléchargement de l'avatar", {
-        description: error.message
+        description: errorMessage
       });
     } finally {
       setIsUploading(false);
