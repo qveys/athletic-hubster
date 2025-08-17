@@ -26,6 +26,7 @@ const Competitions = () => {
     queryKey: ["competitions"],
     queryFn: async () => {
       const { data, error } = await supabase
+          .schema("athletic")
         .from("competitions")
         .select("*")
         .order("start_date", { ascending: true });

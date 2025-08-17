@@ -26,6 +26,7 @@ const Profile = () => {
 
       try {
         const { data, error } = await supabase
+            .schema('athletic')
           .from('profiles')
           .select('username, full_name, avatar_url')
           .eq('id', user.id)
@@ -43,6 +44,7 @@ const Profile = () => {
         } else {
           // Si aucun profil n'est trouvé, on crée un nouveau profil
           const { error: insertError } = await supabase
+            .schema('athletic')
             .from('profiles')
             .insert([{ 
               id: user.id,
